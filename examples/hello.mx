@@ -1,0 +1,3 @@
+println "Hi Everyone".!
+set iax to 10.!
+println "This is no %d from mathsel", iax.!

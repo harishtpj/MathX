@@ -1,4 +1,4 @@
-# Mathx Command line argument parser
+# Mathx C Program Template
 # Copyright (c) 2022 Harish Kumar
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,19 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import argparse
-from . import __version_str__
+cprogram = """
+#include <stdio.h>
 
-arg_parser = argparse.ArgumentParser(prog="mathx",
-                                    description="The Mathx programming language compiler")
-
-arg_parser.add_argument('File',
-                        metavar='file',
-                        type=str,
-                        help="The File to compile")
-
-arg_parser.add_argument("-v",
-                        "--version",
-                        action="version",
-                        version=__version_str__,
-                        help="shows version info of Mathx compiler")
+int main() {
+""".lstrip()

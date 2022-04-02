@@ -1,4 +1,4 @@
-# Mathx Command line argument parser
+# Mathx File Utilities
 # Copyright (c) 2022 Harish Kumar
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,19 +19,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import argparse
-from . import __version_str__
+import sys
+import os
 
-arg_parser = argparse.ArgumentParser(prog="mathx",
-                                    description="The Mathx programming language compiler")
+from .template import cprogram
 
-arg_parser.add_argument('File',
-                        metavar='file',
-                        type=str,
-                        help="The File to compile")
 
-arg_parser.add_argument("-v",
-                        "--version",
-                        action="version",
-                        version=__version_str__,
-                        help="shows version info of Mathx compiler")
+class FileUtils:
+    @staticmethod
+    def isFile(fname):
+        if not os.path.exists(fname):
+            sys.stderr.write(f"Error: Cannot open file {fname}\n")
+            sys.stderr.write(f"Compilation terminated\n")
+            sys.exit(-1)
+
+    @staticmethod
+    def ReadFile(fname):
+        FileUtils.isFile(fname)
+        fcont = ""
+        with open(fname) as fr:
+            fcont = fr.read()
+        if fcont[-1] != '\n':
+            sys.stderr.write(f"Error: {fname} should end with a newline\n")
+            sys.stderr.write(f"Compilation terminated\n")
+            sys.exit(-1)
+        return fcont
+    
+    @staticmethod
+    def WriteFile(fname, fcont):
+        with open(fname, "w") as fr:
+            fr.write(fcont)
+
+    @staticmethod
+    def WriteCProgram(fname, prog):
+        fname = os.path.basename(os.path.realpath(fname))
+        cfname = fname[:-3] + ".c"
+        cprog = cprogram + prog + "return 0;\n}"
+        FileUtils.WriteFile(cfname, cprog)
+        

@@ -1,4 +1,4 @@
-# Mathx Command line argument parser
+# The Mathx Compiler
 # Copyright (c) 2022 Harish Kumar
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,19 +19,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import argparse
-from . import __version_str__
+import re
 
-arg_parser = argparse.ArgumentParser(prog="mathx",
-                                    description="The Mathx programming language compiler")
+class Compiler:
+    def Fstexp(stmt):
+        return stmt.split(" ")[0]
+    
+    def Retexp(stmt):
+        return stmt.split(" ", 1)[1]
+    
+    def Compile(program_stmt):
+        cprog = ""
 
-arg_parser.add_argument('File',
-                        metavar='file',
-                        type=str,
-                        help="The File to compile")
-
-arg_parser.add_argument("-v",
-                        "--version",
-                        action="version",
-                        version=__version_str__,
-                        help="shows version info of Mathx compiler")
+        for stmt in program_stmt:
+            if Compiler.Fstexp(stmt) == "print":
+                cprog += f"printf({Compiler.Retexp(stmt)});\n"
+            elif Compiler.Fstexp(stmt) == "println":
+                cprog += f"printf({Compiler.Retexp(stmt)});\n"
+                cprog += "printf(\"\\n\");\n"
+        
+        return cprog

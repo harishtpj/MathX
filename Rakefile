@@ -11,6 +11,12 @@ end
 
 desc "Cleans Working Directory"
 task :clean do
-    rm_rf "mathx\\__pycache__", verbose: false
+    mv Dir.glob("*.c"), "examples", verbose: false
     puts "---> Cleaned Directory"
+end
+
+desc "Cleans Working Directory by deleting files"
+task :fresh do
+    rm_rf "mathx\\__pycache__", verbose: false
+    puts "---> Cleaned Directory by deleting files"
 end

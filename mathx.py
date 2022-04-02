@@ -28,6 +28,22 @@ import sys
 
 # Compiler Imports
 from mathx.cmdargs import arg_parser
+from mathx.fileutils import FileUtils
+from mathx.tools import Tools
+from mathx.compiler import Compiler
 
 
-args = arg_parser.parse_args()
+class Mathx:
+    @staticmethod
+    def Run(fname):
+        program = FileUtils.ReadFile(fname)
+        program_stmt = Tools.PrepareForCompile(program)
+        mainfunc = Compiler.Compile(program_stmt)
+        FileUtils.WriteCProgram(fname, mainfunc)
+
+    @staticmethod
+    def Main():
+        args = arg_parser.parse_args()
+        Mathx.Run(args.File)
+
+Mathx.Main()

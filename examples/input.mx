@@ -1,0 +1,3 @@
+print "Enter your name: ".
+input to $cax.
+println "Welcome, %s", cax.

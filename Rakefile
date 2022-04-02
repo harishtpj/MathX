@@ -2,6 +2,7 @@ PY="python"
 SRC="mathx.py"
 
 task :default => [:run]
+task :neat => [:fresh, :clean]
 
 desc "Runs Mathx Compiler"
 task :run do
@@ -18,5 +19,6 @@ end
 desc "Cleans Working Directory by deleting files"
 task :fresh do
     rm_rf "mathx\\__pycache__", verbose: false
+    rm_f Dir.glob("*.exe"), verbose: false
     puts "---> Cleaned Directory by deleting files"
 end

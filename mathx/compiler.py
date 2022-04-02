@@ -37,5 +37,13 @@ class Compiler:
             elif Compiler.Fstexp(stmt) == "println":
                 cprog += f"printf({Compiler.Retexp(stmt)});\n"
                 cprog += "printf(\"\\n\");\n"
+            elif re.search(r"set ([$]?\w+) to ([\"]?\w+[\"]?)", stmt):
+                match = re.search(r"set ([$]?\w+) to ([\"]?\w+[\"]?)", stmt)
+                var = match.group(1)
+                val = match.group(2)
+                if var[0] == '$':
+                    cprog += f"strcpy({var[1:]},{val});\n"
+                else:
+                    cprog += f"{var} = {val};\n"
         
         return cprog

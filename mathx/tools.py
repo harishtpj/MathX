@@ -19,8 +19,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import os
+
 
 class Tools:
     @staticmethod
     def PrepareForCompile(fcont):
         return fcont.replace("\t", " ").split(".\n")
+    
+    @staticmethod
+    def RunProgram(fname):
+        fname = os.path.basename(os.path.realpath(fname))
+        cfname = fname[:-3] + ".c"
+        os.system(f"tcc {cfname}")

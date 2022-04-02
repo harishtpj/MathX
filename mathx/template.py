@@ -21,6 +21,14 @@
 
 cprogram = """
 #include <stdio.h>
+#include <math.h>
+#include <string.h>
 
 int main() {
+int iax, ibx, icx, idx;
+double dax, dbx, dcx, ddx;
+char cax[100], cbx[100], ccx[100], cdx[100];
+int isp[10];
+double dsp[10];
+char csp[10][100];
 """.lstrip()

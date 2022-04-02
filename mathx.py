@@ -40,6 +40,7 @@ class Mathx:
         program_stmt = Tools.PrepareForCompile(program)
         mainfunc = Compiler.Compile(program_stmt)
         FileUtils.WriteCProgram(fname, mainfunc)
+        Tools.RunProgram(fname)
 
     @staticmethod
     def Main():

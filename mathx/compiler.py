@@ -32,6 +32,8 @@ class Compiler:
         cprog = ""
 
         for stmt in program_stmt:
+            stmt = stmt.strip()
+            
             if Compiler.Fstexp(stmt) == "print":
                 cprog += f"printf({Compiler.Retexp(stmt)});\n"
             elif Compiler.Fstexp(stmt) == "println":
@@ -54,5 +56,7 @@ class Compiler:
                     cprog += f"scanf(\"%d\", &{var[1:]});\n"
                 elif var[0] == '!':
                     cprog += f"scanf(\"%lf\", &{var[1:]});\n"
+            elif Compiler.Fstexp(stmt) == "!:":
+                continue
         
         return cprog

@@ -1,3 +1,15 @@
+!: Mathsel program to take different inputs.
+
 print "Enter your name: ".
 input to $cax.
 println "Welcome, %s", cax.
+
+!: Numerical input.
+print "Enter a no: ".
+input to @iax.
+println "You Entered: %d", iax.
+
+!: Double input.
+print "Enter a float no: ".
+input to !dax.
+println "You Entered: %lf", dax.

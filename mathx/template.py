@@ -24,11 +24,13 @@ cprogram = """
 #include <math.h>
 #include <string.h>
 
+typedef char String[100];
+
 int main() {
 int iax, ibx, icx, idx;
 double dax, dbx, dcx, ddx;
-char cax[100], cbx[100], ccx[100], cdx[100];
+String cax, cbx, ccx, cdx;
 int isp[10];
 double dsp[10];
-char csp[10][100];
+String csp[10];
 """.lstrip()

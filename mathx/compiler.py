@@ -58,5 +58,10 @@ class Compiler:
                     cprog += f"scanf(\"%lf\", &{var[1:]});\n"
             elif Compiler.Fstexp(stmt) == "!:":
                 continue
+            elif re.search(r"create variable (\w+) of type (\w+)", stmt):
+                match = re.search(r"create variable (\w+) of type (\w+)", stmt)
+                var = match.group(1)
+                vtype = match.group(2)
+                cprog += f"{vtype} {var};\n"
         
         return cprog

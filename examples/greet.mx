@@ -1,0 +1,19 @@
+!: Mathx program to Greet user and get user defined input.
+
+!: gets user name.
+create variable name of type String.
+print "Enter your name: ".
+input to $name.
+println "Welcome %s! this is a sample program written in mathx", name.
+
+!: gets user age.
+create variable age of type int.
+print "%s, may I know your age: ", name.
+input to @age.
+println "Oh Wow, you're of age %d. Good!", age.
+
+!: get user weight.
+create variable mass of type double.
+print "%s, may I know your weight: ", name.
+input to !mass.
+println "Oh Wow, you're of weight %lf. Nice!", mass.

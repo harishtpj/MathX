@@ -21,14 +21,10 @@
 
 import os
 
+def PrepareForCompile(fcont):
+    return fcont.replace("\t", " ").split(".\n")
 
-class Tools:
-    @staticmethod
-    def PrepareForCompile(fcont):
-        return fcont.replace("\t", " ").split(".\n")
-    
-    @staticmethod
-    def RunProgram(fname):
-        fname = os.path.basename(os.path.realpath(fname))
-        cfname = fname[:-3] + ".c"
-        os.system(f"tcc {cfname}")
+def RunProgram(fname):
+    fname = os.path.basename(os.path.realpath(fname))
+    cfname = fname[:-3] + ".c"
+    os.system(f"tcc {cfname}")

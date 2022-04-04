@@ -27,10 +27,10 @@ import sys
 
 
 # Compiler Imports
-from mathx.cmdargs import arg_parser
-from mathx.fileutils import FileUtils
-from mathx.tools import Tools
-from mathx.compiler import Compiler
+from mathx.Cmdargs import arg_parser
+from mathx import FileUtils
+from mathx import Tools
+from mathx import Compiler
 
 
 class Mathx:

@@ -22,38 +22,32 @@
 import sys
 import os
 
-from .template import cprogram
+from .Template import cprogram
+from errors.compiler_error import CompilerError
 
+def isFile(fname):
+    if not os.path.exists(fname):
+        sys.stderr.write(f"Error: Cannot open file {fname}\n")
+        sys.stderr.write(f"Compilation terminated\n")
+        sys.exit(-1)
 
-class FileUtils:
-    @staticmethod
-    def isFile(fname):
-        if not os.path.exists(fname):
-            sys.stderr.write(f"Error: Cannot open file {fname}\n")
-            sys.stderr.write(f"Compilation terminated\n")
-            sys.exit(-1)
+def ReadFile(fname):
+    isFile(fname)
+    fcont = ""
+    with open(fname) as fr:
+        fcont = fr.read()
+    if fcont[-1] != '\n':
+        sys.stderr.write(f"Error: {fname} should end with a newline\n")
+        sys.stderr.write(f"Compilation terminated\n")
+        sys.exit(-1)
+    return fcont
 
-    @staticmethod
-    def ReadFile(fname):
-        FileUtils.isFile(fname)
-        fcont = ""
-        with open(fname) as fr:
-            fcont = fr.read()
-        if fcont[-1] != '\n':
-            sys.stderr.write(f"Error: {fname} should end with a newline\n")
-            sys.stderr.write(f"Compilation terminated\n")
-            sys.exit(-1)
-        return fcont
-    
-    @staticmethod
-    def WriteFile(fname, fcont):
-        with open(fname, "w") as fr:
-            fr.write(fcont)
+def WriteFile(fname, fcont):
+    with open(fname, "w") as fr:
+        fr.write(fcont)
 
-    @staticmethod
-    def WriteCProgram(fname, prog):
-        fname = os.path.basename(os.path.realpath(fname))
-        cfname = fname[:-3] + ".c"
-        cprog = cprogram + prog + "return 0;\n}"
-        FileUtils.WriteFile(cfname, cprog)
-        
+def WriteCProgram(fname, prog):
+    fname = os.path.basename(os.path.realpath(fname))
+    cfname = fname[:-3] + ".c"
+    cprog = cprogram + prog + "return 0;\n}"
+    WriteFile(cfname, cprog)     

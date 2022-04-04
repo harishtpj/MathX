@@ -1,4 +1,4 @@
-# Mathx Tools
+# Mathx Error Template
 # Copyright (c) 2022 Harish Kumar
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,15 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
-
-def PrepareForCompile(fcont):
-    return fcont.replace("\t", " ").split(".\n")
-
-def RunProgram(fname):
-    fname = os.path.basename(os.path.realpath(fname))
-    cfname = fname[:-3] + ".c"
-    os.system(f"tcc {cfname}")
-
-def ThrowError(err):
-    err.run()
+class Error:
+    def __init__(self, errname, errmsg):
+        self.errname = errname
+        self.errmsg = errmsg

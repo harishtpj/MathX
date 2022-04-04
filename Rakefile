@@ -19,6 +19,7 @@ end
 desc "Cleans Working Directory by deleting files"
 task :fresh do
     rm_rf "mathx\\__pycache__", verbose: false
+    rm_rf "mathx\\errors\\__pycache__", verbose: false
     rm_f Dir.glob("*.exe"), verbose: false
     puts "---> Cleaned Directory by deleting files"
 end

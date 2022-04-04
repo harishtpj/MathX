@@ -21,7 +21,7 @@
 
 import re
 import sys
-import Keywords
+from . import Keywords
 
 
 def Fstexp(stmt):

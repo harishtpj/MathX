@@ -19,17 +19,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import sys
 import os
 
 from .Template import cprogram
-from errors.compiler_error import CompilerError
+from . import Tools
+from .errors.compiler_error import CompilerError
 
 def isFile(fname):
     if not os.path.exists(fname):
-        sys.stderr.write(f"Error: Cannot open file {fname}\n")
-        sys.stderr.write(f"Compilation terminated\n")
-        sys.exit(-1)
+        Tools.ThrowError(CompilerError(
+            "IOError",
+            f"Cannot open file {fname}"
+        ))
 
 def ReadFile(fname):
     isFile(fname)
@@ -37,9 +38,10 @@ def ReadFile(fname):
     with open(fname) as fr:
         fcont = fr.read()
     if fcont[-1] != '\n':
-        sys.stderr.write(f"Error: {fname} should end with a newline\n")
-        sys.stderr.write(f"Compilation terminated\n")
-        sys.exit(-1)
+        Tools.ThrowError(CompilerError(
+            "SyntaxError",
+            f"{fname} should end with a newline"
+        ))
     return fcont
 
 def WriteFile(fname, fcont):

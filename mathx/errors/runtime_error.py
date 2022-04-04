@@ -1,4 +1,4 @@
-# Mathx Tools
+# Mathx Runtime Error
 # Copyright (c) 2022 Harish Kumar
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,15 +19,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
+import sys
+from .error import Error
 
-def PrepareForCompile(fcont):
-    return fcont.replace("\t", " ").split(".\n")
+class RuntimeError(Error):
+    def __init__(self, errname, errmsg, errstmt, errlno):
+        self.errstmt = errstmt
+        self.errlno = errlno
+        super().__init__(errname, errmsg)
 
-def RunProgram(fname):
-    fname = os.path.basename(os.path.realpath(fname))
-    cfname = fname[:-3] + ".c"
-    os.system(f"tcc {cfname}")
-
-def ThrowError(err):
-    err.run()
+    def run(self):
+        sys.stderr.write("MathX - Runtime Error:\n")
+        sys.stderr.write(f"In Statement {self.errlno}:\n")
+        sys.stderr.write(f"\t{self.errstmt}\n")
+        sys.stderr.write(f"{self.errname} : {self.errmsg}\n")
+        sys.exit(-1)

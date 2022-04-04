@@ -1,4 +1,4 @@
-# Mathx Tools
+# Mathx Compiler Error
 # Copyright (c) 2022 Harish Kumar
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,15 +19,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import os
+import sys
+from .error import Error
 
-def PrepareForCompile(fcont):
-    return fcont.replace("\t", " ").split(".\n")
-
-def RunProgram(fname):
-    fname = os.path.basename(os.path.realpath(fname))
-    cfname = fname[:-3] + ".c"
-    os.system(f"tcc {cfname}")
-
-def ThrowError(err):
-    err.run()
+class CompilerError(Error):  
+    def run(self):
+        sys.stderr.write("MathX - Compile Time Error:\n")
+        sys.stderr.write(f"\t{self.errname} : {self.errmsg}\n")
+        sys.stderr.write("Compilation terminated\n")
+        sys.exit(-1)

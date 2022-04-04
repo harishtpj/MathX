@@ -19,8 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-Vars = [
-    "iax", "ibx", "icx", "idx",
-    "cax", "bbx", "ccx", "ddx",
-    "dax", "dbx", "dcx", "ddx",
-]
+Vars = {
+    "int" : ["iax", "ibx", "icx", "idx"],
+    "double" : ["dax", "dbx", "dcx", "ddx"],
+    "String" : ["cax", "bbx", "ccx", "cdx"]
+}

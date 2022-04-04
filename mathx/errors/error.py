@@ -20,6 +20,16 @@
 # SOFTWARE.
 
 class Error:
+    """
+    Base Error Class for MathX Compiler
+
+    Error Types:
+    IOError - Error on Input/Output Operations
+    SyntaxError - Error on Language Syntax
+    VarError - Error on Variable Operations
+    InvalidOperationsError - Error on Data Type Operations
+    AssignmentError - Error on Variable Assignment
+    """
     def __init__(self, errname, errmsg):
         self.errname = errname
         self.errmsg = errmsg

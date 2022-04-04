@@ -32,12 +32,11 @@ from mathx import FileUtils
 from mathx import Tools
 from mathx import Compiler
 
-
 class Mathx:
     @staticmethod
     def Run(fname):
         program = FileUtils.ReadFile(fname)
-        program_stmt = Tools.PrepareForCompile(program)
+        program_stmt = FileUtils.ReadFileAsLines(fname)
         mainfunc = Compiler.Compile(program_stmt)
         FileUtils.WriteCProgram(fname, mainfunc)
         Tools.RunProgram(fname)

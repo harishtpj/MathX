@@ -20,6 +20,7 @@
 # SOFTWARE.
 
 import os
+from . import Keywords
 
 def PrepareForCompile(fcont):
     return fcont.replace("\t", " ").split(".\n")
@@ -31,3 +32,11 @@ def RunProgram(fname):
 
 def ThrowError(err):
     err.run()
+
+def GetDataType(var):
+    if var in Keywords.Vars["int"]:
+        return "int"
+    elif var in Keywords.Vars["double"]:
+        return "double"
+    elif var in Keywords.Vars["String"]:
+        return "String"

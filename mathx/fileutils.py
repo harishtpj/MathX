@@ -44,6 +44,13 @@ def ReadFile(fname):
         ))
     return fcont
 
+def ReadFileAsLines(fname):
+    isFile(fname)
+    fcont = ""
+    with open(fname) as fr:
+        fcont = fr.readlines()
+    return fcont
+
 def WriteFile(fname, fcont):
     with open(fname, "w") as fr:
         fr.write(fcont)

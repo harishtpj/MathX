@@ -69,15 +69,28 @@ def Compile(program_stmt):
                     else:
                         Tools.ThrowError(RuntimeError(
                             "AssignmentError",
-                            f"Can't assign {val} of type {Tools.GetDataType(val[1:])} to {var[1:]}({Tools.GetDataType(val)})",
+                            f"Can't assign {val} of type {Tools.GetDataType(val[1:])} to {var[1:]}({Tools.GetDataType(var[1:])})",
                             stmt,
                             program_stmt.index(stmt)+1
                         ))
                 else:
-                    if var[0] == '$':
+                    if var[0] == '$' and var[1:] in Keywords.Vars["String"] and Tools.GetDataTypeValue(val) == "String":
                         cprog += f"strcpy({var[1:]},{val});\n"
-                    else:
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
                         cprog += f"{var[1:]} += {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} += {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} += {val};\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} += {val};\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "AssignmentError",
+                            f"Can't assign {val} of type {Tools.GetDataTypeValue(val[1:])} to {var[1:]}({Tools.GetDataType(var[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",

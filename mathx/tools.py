@@ -40,6 +40,8 @@ def GetDataType(var):
         return "double"
     elif var in Keywords.Vars["String"]:
         return "String"
+    elif var in Keywords.Vars["bool"]:
+        return "bool"
 
 def GetDataTypeValue(val):
     try:
@@ -50,4 +52,8 @@ def GetDataTypeValue(val):
             float(val)
             return "double"
         except ValueError:
-            return "String"
+            try:
+                bool(val)
+                return "bool"
+            except ValueError:
+                return "String"

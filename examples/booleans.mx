@@ -1,0 +1,7 @@
+!: Mathx Boolean Operations
+
+create variable test of type bool.
+create variable test2 of type bool.
+
+set #test to true.
+print "%d", test.

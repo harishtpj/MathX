@@ -24,6 +24,9 @@ cprogram = """
 #include <math.h>
 #include <string.h>
 
+#define bool _Bool
+#define true 1
+#define false 0
 typedef char String[100];
 
 int main() {

@@ -20,7 +20,6 @@
 # SOFTWARE.
 
 import re
-import sys
 from . import Keywords
 from .errors.runtime_error import RuntimeError
 from . import Tools
@@ -50,8 +49,8 @@ def Compile(program_stmt):
             cprog += f"printf({Retexp(stmt)});\n"
             cprog += "printf(\"\\n\");\n"
 
-        elif re.search(r"set ([$@!]\w+) to ([$@!]\w+|[\"]?\w+(\.\d+)?[\"]?)", stmt): # Sets variable value
-            match = re.search(r"set ([$@!]\w+) to ([$@!]\w+|[\"]?\w+(\.\d+)?[\"]?)", stmt)
+        elif re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|[\"]?\w+(\.\d+)?[\"]?)", stmt): # Sets variable value
+            match = re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|[\"]?\w+(\.\d+)?[\"]?)", stmt)
             var = match.group(1)
             val = match.group(2)
             if var[1:] in variables:
@@ -66,10 +65,12 @@ def Compile(program_stmt):
                         cprog += f"{var[1:]} = {val[1:]};\n"
                     elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
                         cprog += f"{var[1:]} = {val[1:]};\n"
+                    elif var[0] == '#' and val[0] == '#' and var[1:] in Keywords.Vars["bool"] and val[1:] in Keywords.Vars["bool"]:
+                        cprog += f"{var[1:]} = {val[1:]};\n"
                     else:
                         Tools.ThrowError(RuntimeError(
                             "AssignmentError",
-                            f"Can't assign {val} of type {Tools.GetDataType(val[1:])} to {var[1:]}({Tools.GetDataType(var[1:])})",
+                            f"Can't assign {val} of type {Tools.GetDataType(val[1:])} to {var}({Tools.GetDataType(var[1:])})",
                             stmt,
                             program_stmt.index(stmt)+1
                         ))
@@ -84,10 +85,12 @@ def Compile(program_stmt):
                         cprog += f"{var[1:]} = {val};\n"
                     elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
                         cprog += f"{var[1:]} = {val};\n"
+                    elif var[0] == '#' and var[1:] in Keywords.Vars["bool"] and Tools.GetDataTypeValue(val) == "bool":
+                        cprog += f"{var[1:]} = {val};\n"
                     else:
                         Tools.ThrowError(RuntimeError(
                             "AssignmentError",
-                            f"Can't assign {val} of type {Tools.GetDataTypeValue(val[1:])} to {var[1:]}({Tools.GetDataType(var[1:])})",
+                            f"Can't assign {val} of type {Tools.GetDataTypeValue(val[1:])} to {var}({Tools.GetDataType(var[1:])})",
                             stmt,
                             program_stmt.index(stmt)+1
                         ))
@@ -109,6 +112,8 @@ def Compile(program_stmt):
                     cprog += f"scanf(\"%d\", &{var[1:]});\n"
                 elif var[0] == '!' and var[1:] in Keywords.Vars["double"]:
                     cprog += f"scanf(\"%lf\", &{var[1:]});\n"
+                elif var[0] == '#' and var[1:] in Keywords.Vars["bool"]:
+                    cprog += f"scanf(\"%d\", &{var[1:]});\n"
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
@@ -128,18 +133,32 @@ def Compile(program_stmt):
                     stmt,
                     program_stmt.index(stmt)+1
                 ))
+            elif vtype not in Keywords.Vars.keys():
+                Tools.ThrowError(RuntimeError(
+                    "SyntaxError",
+                    f"Unknown Data Type - {vtype}",
+                    stmt,
+                    program_stmt.index(stmt)+1
+                ))
             else:
                 cprog += f"{vtype} {var};\n"
                 Keywords.Vars[vtype].append(var)
 
-        elif re.search(r"increment ([$@!]\w+)", stmt): # Increment Variable
-            match = re.search(r"increment ([$@!]\w+)", stmt)
+        elif re.search(r"increment ([$@!#]\w+)", stmt): # Increment Variable
+            match = re.search(r"increment ([$@!#]\w+)", stmt)
             var = match.group(1)
             if var[1:] in variables:
                 if var[0] == '$':
                     Tools.ThrowError(RuntimeError(
                         "InvalidOperationsError",
                         "String can't be incremented",
+                        stmt,
+                        program_stmt.index(stmt)+1
+                    ))
+                elif var[0] == '#':
+                    Tools.ThrowError(RuntimeError(
+                        "InvalidOperationsError",
+                        "Boolean can't be incremented",
                         stmt,
                         program_stmt.index(stmt)+1
                     ))
@@ -153,14 +172,21 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"decrement ([$@!]\w+)", stmt): # Decrement Variable
-            match = re.search(r"decrement ([$@!]\w+)", stmt)
+        elif re.search(r"decrement ([$@!#]\w+)", stmt): # Decrement Variable
+            match = re.search(r"decrement ([$@!#]\w+)", stmt)
             var = match.group(1)
             if var[1:] in variables:
                 if var[0] == '$':
                     Tools.ThrowError(RuntimeError(
                         "InvalidOperationsError",
                         "String can't be decremented",
+                        stmt,
+                        program_stmt.index(stmt)+1
+                    ))
+                elif var[0] == '#':
+                    Tools.ThrowError(RuntimeError(
+                        "InvalidOperationsError",
+                        "Boolean can't be decremented",
                         stmt,
                         program_stmt.index(stmt)+1
                     ))
@@ -174,8 +200,8 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"add ([$@!]\w+|\d+(\.\d+)?) to ([$@!]\w+)", stmt): # Addition
-            match = re.search(r"add ([$@!]\w+|\d+(\.\d+)?) to ([$@!]\w+)", stmt)
+        elif re.search(r"add ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Addition
+            match = re.search(r"add ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt)
             val = match.group(1)
             var = match.group(3)
             if var[1:] in variables:
@@ -219,8 +245,8 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"subtract ([$@!]\w+|\d+(\.\d+)?) from ([$@!]\w+)", stmt): # Subtraction
-            match = re.search(r"subtract ([$@!]\w+|\d+(\.\d+)?) from ([$@!]\w+)", stmt)
+        elif re.search(r"subtract ([$@!#]\w+|\d+(\.\d+)?) from ([$@!#]\w+)", stmt): # Subtraction
+            match = re.search(r"subtract ([$@!#]\w+|\d+(\.\d+)?) from ([$@!#]\w+)", stmt)
             val = match.group(1)
             var = match.group(3)
             if var[1:] in variables:
@@ -264,8 +290,8 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"multiply ([$@!]\w+|\d+(\.\d+)?) with ([$@!]\w+)", stmt): # Multiplication
-            match = re.search(r"multiply ([$@!]\w+|\d+(\.\d+)?) with ([$@!]\w+)", stmt)
+        elif re.search(r"multiply ([$@!#]\w+|\d+(\.\d+)?) with ([$@!#]\w+)", stmt): # Multiplication
+            match = re.search(r"multiply ([$@!#]\w+|\d+(\.\d+)?) with ([$@!#]\w+)", stmt)
             val = match.group(1)
             var = match.group(3)
             if var[1:] in variables:
@@ -309,8 +335,8 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"divide ([$@!]\w+|\d+(\.\d+)?) into ([$@!]\w+)", stmt): # Division
-            match = re.search(r"divide ([$@!]\w+|\d+(\.\d+)?) into ([$@!]\w+)", stmt)
+        elif re.search(r"divide ([$@!#]\w+|\d+(\.\d+)?) into ([$@!#]\w+)", stmt): # Division
+            match = re.search(r"divide ([$@!#]\w+|\d+(\.\d+)?) into ([$@!#]\w+)", stmt)
             val = match.group(1)
             var = match.group(3)
             if var[1:] in variables:

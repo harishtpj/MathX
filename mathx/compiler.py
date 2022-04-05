@@ -77,13 +77,13 @@ def Compile(program_stmt):
                     if var[0] == '$' and var[1:] in Keywords.Vars["String"] and Tools.GetDataTypeValue(val) == "String":
                         cprog += f"strcpy({var[1:]},{val});\n"
                     elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
-                        cprog += f"{var[1:]} += {val};\n"
+                        cprog += f"{var[1:]} = {val};\n"
                     elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
-                        cprog += f"{var[1:]} += {val};\n"
+                        cprog += f"{var[1:]} = {val};\n"
                     elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
-                        cprog += f"{var[1:]} += {val};\n"
+                        cprog += f"{var[1:]} = {val};\n"
                     elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
-                        cprog += f"{var[1:]} += {val};\n"
+                        cprog += f"{var[1:]} = {val};\n"
                     else:
                         Tools.ThrowError(RuntimeError(
                             "AssignmentError",
@@ -103,11 +103,11 @@ def Compile(program_stmt):
             match = re.search(r"input to ([$@!]\w+)", stmt)
             var = match.group(1)
             if var[1:] in variables:
-                if var[0] == '$':
+                if var[0] == '$' and var[1:] in Keywords.Vars["String"]:
                     cprog += f"scanf(\"%[^\\n]%*c\", {var[1:]});\n"
-                elif var[0] == '@':
+                elif var[0] == '@' and var[1:] in Keywords.Vars["int"]:
                     cprog += f"scanf(\"%d\", &{var[1:]});\n"
-                elif var[0] == '!':
+                elif var[0] == '!' and var[1:] in Keywords.Vars["double"]:
                     cprog += f"scanf(\"%lf\", &{var[1:]});\n"
             else:
                 Tools.ThrowError(RuntimeError(
@@ -121,8 +121,16 @@ def Compile(program_stmt):
             match = re.search(r"create variable (\w+) of type (\w+)", stmt)
             var = match.group(1)
             vtype = match.group(2)
-            cprog += f"{vtype} {var};\n"
-            Keywords.Vars[vtype].append(var)
+            if var in variables:
+                Tools.ThrowError(RuntimeError(
+                    "VarError",
+                    f"Can't Reassign variable {var} which was already created",
+                    stmt,
+                    program_stmt.index(stmt)+1
+                ))
+            else:
+                cprog += f"{vtype} {var};\n"
+                Keywords.Vars[vtype].append(var)
 
         elif re.search(r"increment ([$@!]\w+)", stmt): # Increment Variable
             match = re.search(r"increment ([$@!]\w+)", stmt)
@@ -166,15 +174,43 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"add ([@!]\w+|\d+(\.\d+)?) to ([@!]\w+)", stmt): # Addition
-            match = re.search(r"add ([@!]\w+|\d+(\.\d+)?) to ([@!]\w+)", stmt)
+        elif re.search(r"add ([$@!]\w+|\d+(\.\d+)?) to ([$@!]\w+)", stmt): # Addition
+            match = re.search(r"add ([$@!]\w+|\d+(\.\d+)?) to ([$@!]\w+)", stmt)
             val = match.group(1)
             var = match.group(3)
             if var[1:] in variables:
                 if val[1:] in variables:
-                    cprog += f"{var[1:]} += {val[1:]};\n"
+                    if var[0] == '@' and val[0] == '@' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} += {val[1:]};\n"
+                    elif var[0] == '!' and val[0] == '!' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} += {val[1:]};\n"
+                    elif var[0] == '!' and val[0] == '@' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} += {val[1:]};\n"
+                    elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} += {val[1:]};\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate + on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
                 else:
-                    cprog += f"{var[1:]} += {val};\n"
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} += {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} += {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} += {val};\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} += {val};\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate + on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
@@ -183,15 +219,43 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"subtract ([@!]\w+|\d+(\.\d+)?) from ([@!]\w+)", stmt): # Subtraction
-            match = re.search(r"subtract ([@!]\w+|\d+(\.\d+)?) from ([@!]\w+)", stmt)
+        elif re.search(r"subtract ([$@!]\w+|\d+(\.\d+)?) from ([$@!]\w+)", stmt): # Subtraction
+            match = re.search(r"subtract ([$@!]\w+|\d+(\.\d+)?) from ([$@!]\w+)", stmt)
             val = match.group(1)
             var = match.group(3)
             if var[1:] in variables:
                 if val[1:] in variables:
-                    cprog += f"{var[1:]} -= {val[1:]};\n"
+                    if var[0] == '@' and val[0] == '@' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} -= {val[1:]};\n"
+                    elif var[0] == '!' and val[0] == '!' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} -= {val[1:]};\n"
+                    elif var[0] == '!' and val[0] == '@' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} -= {val[1:]};\n"
+                    elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} -= {val[1:]};\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate - on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
                 else:
-                    cprog += f"{var[1:]} -= {val};\n"
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} -= {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} -= {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} -= {val};\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} -= {val};\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate - on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
@@ -200,15 +264,43 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"multiply ([@!]\w+|\d+(\.\d+)?) with ([@!]\w+)", stmt): # Multiplication
-            match = re.search(r"multiply ([@!]\w+|\d+(\.\d+)?) with ([@!]\w+)", stmt)
+        elif re.search(r"multiply ([$@!]\w+|\d+(\.\d+)?) with ([$@!]\w+)", stmt): # Multiplication
+            match = re.search(r"multiply ([$@!]\w+|\d+(\.\d+)?) with ([$@!]\w+)", stmt)
             val = match.group(1)
             var = match.group(3)
             if var[1:] in variables:
                 if val[1:] in variables:
-                    cprog += f"{var[1:]} *= {val[1:]};\n"
+                    if var[0] == '@' and val[0] == '@' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} *= {val[1:]};\n"
+                    elif var[0] == '!' and val[0] == '!' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} *= {val[1:]};\n"
+                    elif var[0] == '!' and val[0] == '@' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} *= {val[1:]};\n"
+                    elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} *= {val[1:]};\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate * on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
                 else:
-                    cprog += f"{var[1:]} *= {val};\n"
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} *= {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} *= {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} *= {val};\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} *= {val};\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate * on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
@@ -217,15 +309,50 @@ def Compile(program_stmt):
                     program_stmt.index(stmt)+1
                 ))
 
-        elif re.search(r"divide ([@!]\w+|\d+(\.\d+)?) into ([@!]\w+)", stmt): # Division
-            match = re.search(r"divide ([@!]\w+|\d+(\.\d+)?) into ([@!]\w+)", stmt)
+        elif re.search(r"divide ([$@!]\w+|\d+(\.\d+)?) into ([$@!]\w+)", stmt): # Division
+            match = re.search(r"divide ([$@!]\w+|\d+(\.\d+)?) into ([$@!]\w+)", stmt)
             val = match.group(1)
             var = match.group(3)
             if var[1:] in variables:
                 if val[1:] in variables:
-                    cprog += f"{var[1:]} /= {val[1:]};\n"
+                    if var[0] == '@' and val[0] == '@' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} /= {val[1:]};\n"
+                    elif var[0] == '!' and val[0] == '!' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} /= {val[1:]};\n"
+                    elif var[0] == '!' and val[0] == '@' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} /= {val[1:]};\n"
+                    elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} /= {val[1:]};\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate / on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
                 else:
-                    cprog += f"{var[1:]} /= {val};\n"
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} /= {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} /= {val};\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} /= {val};\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} /= {val};\n"
+                    elif int(val) == 0:
+                        Tools.ThrowError(RuntimeError(
+                            "ZeroDivisionError",
+                            f"Can't divide {var} by 0",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate / on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",

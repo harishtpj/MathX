@@ -22,5 +22,5 @@
 Vars = {
     "int" : ["iax", "ibx", "icx", "idx"],
     "double" : ["dax", "dbx", "dcx", "ddx"],
-    "String" : ["cax", "bbx", "ccx", "cdx"]
+    "String" : ["cax", "cbx", "ccx", "cdx"]
 }

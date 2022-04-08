@@ -30,20 +30,39 @@ import sys
 from mathx.Cmdargs import arg_parser
 from mathx import FileUtils
 from mathx import Tools
-from mathx import Compiler
+from mathx.c import Compiler
 
 class Mathx:
     @staticmethod
-    def Run(fname):
-        program = FileUtils.ReadFile(fname)
+    def Run(fname, lang):
         program_stmt = FileUtils.ReadFileAsLines(fname)
-        mainfunc = Compiler.Compile(program_stmt)
+
+        if lang == "java":
+            pass
+        else:
+            mainfunc = Compiler.Compile(program_stmt)
+
         FileUtils.WriteCProgram(fname, mainfunc)
         Tools.RunProgram(fname)
+    
+    @staticmethod
+    def Compile(fname, lang):
+        program_stmt = FileUtils.ReadFileAsLines(fname)
+
+        if lang == "java":
+            pass
+        else:
+            mainfunc = Compiler.Compile(program_stmt)
+
+        FileUtils.WriteCProgram(fname, mainfunc)
 
     @staticmethod
     def Main():
         args = arg_parser.parse_args()
-        Mathx.Run(args.File)
+        if args.source:
+            Mathx.Compile(args.File, args.lang)
+        else:
+            Mathx.Run(args.File, args.lang)
+
 
 Mathx.Main()

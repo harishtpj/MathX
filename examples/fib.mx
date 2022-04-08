@@ -18,7 +18,7 @@ input to @n.
 
 print "Fibnocci Series: %d, %d, ", term1, term2.
 
-for ( int i = 3; i <= n; ++i ) {
+for ( int i equals 3; i lesser than equals n; ++i ) {
    print "%d, ", nexterm.
    set @term1 to @term2.
    set @term2 to @nexterm.

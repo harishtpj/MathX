@@ -30,6 +30,17 @@ arg_parser.add_argument('File',
                         type=str,
                         help="The File to compile")
 
+arg_parser.add_argument("-l",
+                        "--lang",
+                        action="store",
+                        type=str,
+                        help="the Language to Transpile")
+
+arg_parser.add_argument("-S",
+                        "--source",
+                        action="store_true",
+                        help="only Compiles Mathx File to Given Language")
+
 arg_parser.add_argument("-v",
                         "--version",
                         action="version",

@@ -20,9 +20,9 @@
 # SOFTWARE.
 
 import re
-from . import Keywords
-from .errors.runtime_error import RuntimeError
-from . import Tools
+from .. import Keywords
+from ..errors.runtime_error import RuntimeError
+from .. import Tools
 
 
 def Fstexp(stmt):
@@ -388,11 +388,14 @@ def Compile(program_stmt):
                 ))
         
         else:
+            if " greater than " in stmt: stmt = stmt.replace("greater than", ">")
+            if " lesser than " in stmt: stmt = stmt.replace("lesser than", "<")
             if " and " in stmt: stmt = stmt.replace("and", "&&")
             if " or " in stmt: stmt = stmt.replace("or", "||")
             if " not " in stmt: stmt = stmt.replace("not ", "!")
             if " equal to " in stmt: stmt = stmt.replace("equal to", "==")
             if " mod " in stmt: stmt = stmt.replace("mod", "%")
+            if " equals " in stmt: stmt = stmt.replace(" equals", "=")
             cprog += stmt # C program
             
     

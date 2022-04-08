@@ -386,5 +386,14 @@ def Compile(program_stmt):
                     stmt,
                     program_stmt.index(stmt)+1
                 ))
+        
+        else:
+            if " and " in stmt: stmt = stmt.replace("and", "&&")
+            if " or " in stmt: stmt = stmt.replace("or", "||")
+            if " not " in stmt: stmt = stmt.replace("not ", "!")
+            if " equal to " in stmt: stmt = stmt.replace("equal to", "==")
+            if " mod " in stmt: stmt = stmt.replace("mod", "%")
+            cprog += stmt # C program
+            
     
     return cprog

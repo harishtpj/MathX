@@ -1,0 +1,28 @@
+!: Mathx Program to calculate fibnocci numbers for given terms.
+
+println "Fibnocci Calculator".
+
+create variable n of type int.
+
+create variable term1 of type int.
+create variable term2 of type int.
+set @term1 to 0.
+set @term2 to 1.
+
+create variable nexterm of type int.
+set @nexterm to @term1.
+add @term2 to @nexterm.
+
+print "Enter the number of terms: ".
+input to @n.
+
+print "Fibnocci Series: %d, %d, ", term1, term2.
+
+for ( int i = 3; i <= n; ++i ) {
+   print "%d, ", nexterm.
+   set @term1 to @term2.
+   set @term2 to @nexterm.
+   set @nexterm to @term1.
+   add @term2 to @nexterm.
+}
+

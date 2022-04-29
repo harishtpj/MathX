@@ -33,7 +33,4 @@ int main() {
 int iax, ibx, icx, idx;
 double dax, dbx, dcx, ddx;
 String cax, cbx, ccx, cdx;
-int isp[10];
-double dsp[10];
-String csp[10];
 """.lstrip()

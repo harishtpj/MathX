@@ -386,6 +386,276 @@ def Compile(program_stmt):
                     stmt,
                     program_stmt.index(stmt)+1
                 ))
+
+        elif re.search(r"square ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Square
+            match = re.search(r"square ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt)
+            val = match.group(1)
+            var = match.group(3)
+            if var[1:] in variables:
+                if val[1:] in variables:
+                    if var[0] == '@' and val[0] == '@' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, 2.0);\n"
+                    elif var[0] == '!' and val[0] == '!' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, 2.0);\n"
+                    elif var[0] == '!' and val[0] == '@' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, 2.0);\n"
+                    elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, 2.0);\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^2 on {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+                else:
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} = pow({val}, 2.0);\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} = pow({val}, 2.0);\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} = pow({val}, 2.0);\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} = pow({val}, 2.0);\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^2 on {val}({Tools.GetDataTypeValue(val)})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+            else:
+                Tools.ThrowError(RuntimeError(
+                    "VarError",
+                    f"Can't find variable {var}",
+                    stmt,
+                    program_stmt.index(stmt)+1
+                ))
+
+        elif re.search(r"sqrt ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Square root
+            match = re.search(r"sqrt ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt)
+            val = match.group(1)
+            var = match.group(3)
+            if var[1:] in variables:
+                if val[1:] in variables:
+                    if var[0] == '@' and val[0] == '@' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = sqrt({val[1:]});\n"
+                    elif var[0] == '!' and val[0] == '!' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = sqrt({val[1:]});\n"
+                    elif var[0] == '!' and val[0] == '@' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = sqrt({val[1:]});\n"
+                    elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = sqrt({val[1:]});\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^1/2 on {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+                else:
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} = sqrt({val});\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} = sqrt({val});\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} = sqrt({val});\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} = sqrt({val});\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^1/2 on {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+            else:
+                Tools.ThrowError(RuntimeError(
+                    "VarError",
+                    f"Can't find variable {var}",
+                    stmt,
+                    program_stmt.index(stmt)+1
+                ))
+        
+        elif re.search(r"cube ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Cube
+            match = re.search(r"cube ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt)
+            val = match.group(1)
+            var = match.group(3)
+            if var[1:] in variables:
+                if val[1:] in variables:
+                    if var[0] == '@' and val[0] == '@' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, 3.0);\n"
+                    elif var[0] == '!' and val[0] == '!' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, 3.0);\n"
+                    elif var[0] == '!' and val[0] == '@' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, 3.0);\n"
+                    elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, 3.0);\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^3 on {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+                else:
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} = pow({val}, 3.0);\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} = pow({val}, 3.0);\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} = pow({val}, 3.0);\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} = pow({val}, 3.0);\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^3 on {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+            else:
+                Tools.ThrowError(RuntimeError(
+                    "VarError",
+                    f"Can't find variable {var}",
+                    stmt,
+                    program_stmt.index(stmt)+1
+                ))
+        
+        elif re.search(r"cbrt ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Cube root
+            match = re.search(r"cbrt ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt)
+            val = match.group(1)
+            var = match.group(3)
+            if var[1:] in variables:
+                if val[1:] in variables:
+                    if var[0] == '@' and val[0] == '@' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, ceil((1/3.0)*100)/100);\n"
+                    elif var[0] == '!' and val[0] == '!' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, ceil((1/3.0)*100)/100);\n"
+                    elif var[0] == '!' and val[0] == '@' and var[1:] in Keywords.Vars["double"] and val[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, ceil((1/3.0)*100)/100);\n"
+                    elif var[0] == '@' and val[0] == '!' and var[1:] in Keywords.Vars["int"] and val[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({val[1:]}, ceil((1/3.0)*100)/100);\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^1/3 on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+                else:
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} = pow({val}, ceil((1/3.0)*100)/100);\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} = pow({val}, ceil((1/3.0)*100)/100);\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(val) == "int":
+                        cprog += f"{var[1:]} = pow({val}, ceil((1/3.0)*100)/100);\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
+                        cprog += f"{var[1:]} = pow({val}, ceil((1/3.0)*100)/100);\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^1/3 on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+            else:
+                Tools.ThrowError(RuntimeError(
+                    "VarError",
+                    f"Can't find variable {var}",
+                    stmt,
+                    program_stmt.index(stmt)+1
+                ))
+
+        elif re.search(r"power ([$@!#]\w+) with ([$@!#]\w+|\d+(\.\d+)?)", stmt): # Power var with exp
+            match = re.search(r"power ([$@!#]\w+) with ([$@!#]\w+|\d+(\.\d+)?)", stmt)
+            exp = match.group(2)
+            var = match.group(1)
+            if var[1:] in variables:
+                if exp[1:] in variables:
+                    if var[0] == '@' and exp[0] == '@' and var[1:] in Keywords.Vars["int"] and exp[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({var[1:]}, {exp[1:]});\n"
+                    elif var[0] == '!' and exp[0] == '!' and var[1:] in Keywords.Vars["double"] and exp[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({var[1:]}, {exp[1:]});\n"
+                    elif var[0] == '!' and exp[0] == '@' and var[1:] in Keywords.Vars["double"] and exp[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({var[1:]}, {exp[1:]});\n"
+                    elif var[0] == '@' and exp[0] == '!' and var[1:] in Keywords.Vars["int"] and exp[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({var[1:]}, {exp[1:]});\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^{exp[1:]} on {var}({Tools.GetDataType(var[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+                else:
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(exp) == "int":
+                        cprog += f"{var[1:]} = pow({var[1:]}, {exp});\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(exp) == "double":
+                        cprog += f"{var[1:]} = pow({var[1:]}, {exp});\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(exp) == "int":
+                        cprog += f"{var[1:]} = pow({var[1:]}, {exp});\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(exp) == "double":
+                        cprog += f"{var[1:]} = pow({var[1:]}, {exp});\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^{exp} on {var}({Tools.GetDataType(var[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+            else:
+                Tools.ThrowError(RuntimeError(
+                    "VarError",
+                    f"Can't find variable {var}",
+                    stmt,
+                    program_stmt.index(stmt)+1
+                ))
+        
+        elif re.search(r"root ([$@!#]\w+) with ([$@!#]\w+|\d+(\.\d+)?)", stmt): # root var with exp
+            match = re.search(r"root ([$@!#]\w+) with ([$@!#]\w+|\d+(\.\d+)?)", stmt)
+            exp = match.group(2)
+            var = match.group(1)
+            if var[1:] in variables:
+                if exp[1:] in variables:
+                    if var[0] == '@' and exp[0] == '@' and var[1:] in Keywords.Vars["int"] and exp[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({var[1:]}, ceil((1.0/{exp[1:]})*100)/100);\n"
+                    elif var[0] == '!' and exp[0] == '!' and var[1:] in Keywords.Vars["double"] and exp[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({var[1:]}, ceil((1.0/{exp[1:]})*100)/100);\n"
+                    elif var[0] == '!' and exp[0] == '@' and var[1:] in Keywords.Vars["double"] and exp[1:] in Keywords.Vars["int"]:
+                        cprog += f"{var[1:]} = pow({var[1:]}, ceil((1.0/{exp[1:]})*100)/100);\n"
+                    elif var[0] == '@' and exp[0] == '!' and var[1:] in Keywords.Vars["int"] and exp[1:] in Keywords.Vars["double"]:
+                        cprog += f"{var[1:]} = pow({var[1:]}, ceil((1.0/{exp[1:]})*100)/100);\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^{exp[1:]} on {var}({Tools.GetDataType(var[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+                else:
+                    if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(exp) == "int":
+                        cprog += f"{var[1:]} = pow({var[1:]}, ceil((1.0/{exp})*100)/100);\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(exp) == "double":
+                        cprog += f"{var[1:]} = pow({var[1:]}, ceil((1.0/{exp})*100)/100);\n"
+                    elif var[0] == '!' and var[1:] in Keywords.Vars["double"] and Tools.GetDataTypeValue(exp) == "int":
+                        cprog += f"{var[1:]} = pow({var[1:]}, ceil((1.0/{exp})*100)/100);\n"
+                    elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(exp) == "double":
+                        cprog += f"{var[1:]} = pow({var[1:]}, ceil((1.0/{exp})*100)/100);\n"
+                    else:
+                        Tools.ThrowError(RuntimeError(
+                            "InvalidOperationsError",
+                            f"Can't operate ^{exp} on {var}({Tools.GetDataType(var[1:])})",
+                            stmt,
+                            program_stmt.index(stmt)+1
+                        ))
+            else:
+                Tools.ThrowError(RuntimeError(
+                    "VarError",
+                    f"Can't find variable {var}",
+                    stmt,
+                    program_stmt.index(stmt)+1
+                ))
         
         else:
             if " greater than " in stmt: stmt = stmt.replace("greater than", ">")

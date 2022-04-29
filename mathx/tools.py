@@ -20,6 +20,7 @@
 # SOFTWARE.
 
 import os
+import shutil
 from . import FileUtils
 from . import Keywords
 
@@ -29,7 +30,9 @@ def PrepareForCompile(fcont):
 def RunProgram(fname):
     fname = os.path.basename(os.path.realpath(fname))
     cfname = fname[:-3] + ".c"
-    os.system(f"tcc {cfname}")
+    cc = os.getenv("CC", "tcc")
+    exe = fname[:-3] + ".exe"
+    os.system(f"{cc} {cfname} -o {exe}")
 
 def ThrowError(err):
     err.run()
@@ -64,4 +67,4 @@ def ClearTemp(tempf, fname):
     tempexe = tempexe[:-3] + ".exe"
     fexe = os.path.basename(os.path.realpath(fname))
     fexe = fexe[:-3] + ".exe"
-    os.rename(tempexe, fexe)
+    shutil.move(tempexe,fexe)

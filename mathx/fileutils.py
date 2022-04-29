@@ -32,6 +32,10 @@ def isFile(fname):
             f"Cannot open file {fname}"
         ))
 
+def cfname(fname):
+    fname = os.path.basename(os.path.realpath(fname))
+    return fname[:-3] + ".c"
+
 def ReadFile(fname):
     isFile(fname)
     fcont = ""
@@ -56,7 +60,5 @@ def WriteFile(fname, fcont):
         fr.write(fcont)
 
 def WriteCProgram(fname, prog):
-    fname = os.path.basename(os.path.realpath(fname))
-    cfname = fname[:-3] + ".c"
     cprog = cprogram + prog + "return 0;\n}"
-    WriteFile(cfname, cprog)     
+    WriteFile(cfname(fname), cprog)  

@@ -23,7 +23,8 @@
 
 
 # Python Imports
-import sys
+import os
+import tempfile
 
 
 # Compiler Imports
@@ -42,8 +43,10 @@ class Mathx:
         else:
             mainfunc = Compiler.Compile(program_stmt)
 
-        FileUtils.WriteCProgram(fname, mainfunc)
-        Tools.RunProgram(fname)
+        tempf = tempfile.NamedTemporaryFile()
+        FileUtils.WriteCProgram(tempf.name, mainfunc)
+        Tools.RunProgram(tempf.name)
+        Tools.ClearTemp(tempf, fname)
     
     @staticmethod
     def Compile(fname, lang):

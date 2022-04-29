@@ -20,6 +20,7 @@
 # SOFTWARE.
 
 import os
+from . import FileUtils
 from . import Keywords
 
 def PrepareForCompile(fcont):
@@ -52,8 +53,15 @@ def GetDataTypeValue(val):
             float(val)
             return "double"
         except ValueError:
-            try:
-                bool(val)
+            if val == "true" or val == "false":
                 return "bool"
-            except ValueError:
+            else:
                 return "String"
+
+def ClearTemp(tempf, fname):
+    os.remove(FileUtils.cfname(tempf.name))
+    tempexe = os.path.basename(os.path.realpath(tempf.name))
+    tempexe = tempexe[:-3] + ".exe"
+    fexe = os.path.basename(os.path.realpath(fname))
+    fexe = fexe[:-3] + ".exe"
+    os.rename(tempexe, fexe)

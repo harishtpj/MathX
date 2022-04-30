@@ -22,7 +22,7 @@
 import argparse
 from . import __version_str__
 
-arg_parser = argparse.ArgumentParser(prog="mathx",
+arg_parser = argparse.ArgumentParser(prog="mathxc",
                                     description="The Mathx programming language compiler")
 
 arg_parser.add_argument('File',

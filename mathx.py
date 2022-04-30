@@ -23,7 +23,6 @@
 
 
 # Python Imports
-import os
 import tempfile
 
 
@@ -50,7 +49,7 @@ class Mathx:
         pre = program_stmt[:main_index]
         main = program_stmt[main_index+1:]
 
-        if lang == "java":
+        if lang == "go":
             pass
         else:
             preprog = Compiler.Compile(pre)
@@ -76,7 +75,7 @@ class Mathx:
         pre = program_stmt[:main_index]
         main = program_stmt[main_index+1:]
 
-        if lang == "java":
+        if lang == "go":
             pass
         else:
             preprog = Compiler.Compile(pre)

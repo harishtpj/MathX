@@ -31,8 +31,12 @@ def RunProgram(fname):
     fname = os.path.basename(os.path.realpath(fname))
     cfname = fname[:-3] + ".c"
     cc = os.getenv("CC", "tcc")
-    exe = fname[:-3] + ".exe"
-    os.system(f"{cc} {cfname} -o {exe}")
+    exe = fname[:-3]
+    if os.name == 'nt':
+        exe += ".exe"
+    if os.system(f"{cc} {cfname} -o {exe}") != 0:
+        os.remove(cfname)
+        exit(-1)
 
 def ThrowError(err):
     err.run()
@@ -64,7 +68,10 @@ def GetDataTypeValue(val):
 def ClearTemp(tempf, fname):
     os.remove(FileUtils.cfname(tempf.name))
     tempexe = os.path.basename(os.path.realpath(tempf.name))
-    tempexe = tempexe[:-3] + ".exe"
+    tempexe = tempexe[:-3]
     fexe = os.path.basename(os.path.realpath(fname))
-    fexe = fexe[:-3] + ".exe"
+    fexe = fexe[:-3]
+    if os.name == 'nt':
+        tempexe += ".exe"
+        fexe += ".exe"
     shutil.move(tempexe,fexe)

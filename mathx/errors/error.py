@@ -30,6 +30,7 @@ class Error:
     InvalidOperationsError - Error on Data Type Operations
     AssignmentError - Error on Variable Assignment
     ZeroDivisionError - Error on Division by Zero
+    EntryError - Error on not specifying main function
     """
     def __init__(self, errname, errmsg):
         self.errname = errname

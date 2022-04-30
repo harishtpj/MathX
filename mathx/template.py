@@ -29,7 +29,6 @@ cprogram = """
 #define false 0
 typedef char String[100];
 
-int main() {
 int iax, ibx, icx, idx;
 double dax, dbx, dcx, ddx;
 String cax, cbx, ccx, cdx;

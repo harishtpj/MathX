@@ -32,19 +32,32 @@ from mathx.Cmdargs import arg_parser
 from mathx import FileUtils
 from mathx import Tools
 from mathx.c import Compiler
+from mathx.errors.compiler_error import CompilerError
 
 class Mathx:
     @staticmethod
     def Run(fname, lang):
         program_stmt = FileUtils.ReadFileAsLines(fname)
 
+        try:
+            main_index = program_stmt.index("main-para:-\n")
+        except ValueError:
+            Tools.ThrowError(CompilerError(
+                "EntryError",
+                f"No main-para found in {fname}"
+            ))
+
+        pre = program_stmt[:main_index]
+        main = program_stmt[main_index+1:]
+
         if lang == "java":
             pass
         else:
-            mainfunc = Compiler.Compile(program_stmt)
+            preprog = Compiler.Compile(pre)
+            mainfunc = Compiler.Compile(main)
 
         tempf = tempfile.NamedTemporaryFile()
-        FileUtils.WriteCProgram(tempf.name, mainfunc)
+        FileUtils.WriteCProgram(tempf.name, preprog, mainfunc)
         Tools.RunProgram(tempf.name)
         Tools.ClearTemp(tempf, fname)
     
@@ -52,12 +65,24 @@ class Mathx:
     def Compile(fname, lang):
         program_stmt = FileUtils.ReadFileAsLines(fname)
 
+        try:
+            main_index = program_stmt.index("main-para:-\n")
+        except ValueError:
+            Tools.ThrowError(CompilerError(
+                "EntryError",
+                f"No main-para found in {fname}"
+            ))
+
+        pre = program_stmt[:main_index]
+        main = program_stmt[main_index+1:]
+
         if lang == "java":
             pass
         else:
-            mainfunc = Compiler.Compile(program_stmt)
+            preprog = Compiler.Compile(pre)
+            mainfunc = Compiler.Compile(main)
 
-        FileUtils.WriteCProgram(fname, mainfunc)
+        FileUtils.WriteCProgram(fname, preprog, mainfunc)
 
     @staticmethod
     def Main():

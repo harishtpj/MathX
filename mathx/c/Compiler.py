@@ -666,7 +666,7 @@ def Compile(program_stmt):
             if " equal to " in stmt: stmt = stmt.replace("equal to", "==")
             if " mod " in stmt: stmt = stmt.replace("mod", "%")
             if " equals " in stmt: stmt = stmt.replace(" equals", "=")
-            cprog += stmt # C program
+            cprog += stmt + "\n" # C program
             
     
     return cprog

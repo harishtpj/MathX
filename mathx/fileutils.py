@@ -59,6 +59,6 @@ def WriteFile(fname, fcont):
     with open(fname, "w") as fr:
         fr.write(fcont)
 
-def WriteCProgram(fname, prog):
-    cprog = cprogram + prog + "return 0;\n}"
+def WriteCProgram(fname, preprog, main):
+    cprog = cprogram + preprog + "int main() {\n" + main + "return 0;\n}"
     WriteFile(cfname(fname), cprog)  

@@ -1,0 +1,18 @@
+!: Sample program to test cases.
+
+int max(int a, int b){
+    return (a > b) ? a : b;
+}
+
+main-para:-
+
+create variable n1 of type int.
+create variable n2 of type int.
+
+print "Enter no 1: ".
+input to @n1.
+
+print "Enter no 2: ".
+input to @n2.
+
+println "Max: %d", max(n1, n2).

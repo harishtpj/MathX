@@ -1,5 +1,7 @@
 !: Exponential Operations.
 
+main-para:-
+
 print "Enter no 1: ".
 input to @iax.
 print "Enter no 2: ".

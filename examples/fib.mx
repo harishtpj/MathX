@@ -1,5 +1,7 @@
 !: Mathx Program to calculate fibnocci numbers for given terms.
 
+main-para:-
+
 println "Fibnocci Calculator".
 
 create variable n of type int.

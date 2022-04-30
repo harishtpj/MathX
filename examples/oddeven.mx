@@ -1,5 +1,7 @@
 !: Mathx program to check if given no is odd or even.
 
+main-para:-
+
 create variable num of type int.
 print "Enter a no: ".
 input to @num.

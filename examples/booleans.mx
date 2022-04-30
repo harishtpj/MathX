@@ -1,5 +1,7 @@
 !: Mathx Boolean Operations
 
+main-para:-
+
 create variable test of type bool.
 create variable test2 of type bool.
 

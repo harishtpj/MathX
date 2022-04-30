@@ -1,5 +1,7 @@
 !: Mathx program to Greet user and get user defined input.
 
+main-para:-
+
 !: gets user name.
 create variable name of type String.
 print "Enter your name: ".

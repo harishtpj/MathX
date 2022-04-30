@@ -1,3 +1,6 @@
+
+main-para:-
+
 print "Hello".
 println "Hi Everyone".
 set @iax to 97.

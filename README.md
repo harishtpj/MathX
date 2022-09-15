@@ -7,7 +7,7 @@ written in Python.
 
 # ℹ About
 Mathx is a Compiler written in Python which Compiles to C Language. This has a very simple syntax which can also be used as C alternative to Very small programs.
-It is actually version 2.0 of Mathsel Compiler written in java with some new syntax and features.
+It is actually version 2.0 of Mathsel Compiler written in java with some new syntax and features. [Click here](https://harish-kumar.gitbook.io/mathx-manual/) for Documentation/Tutorial on the Language
 
 # 👨‍💻 Created By
   - M.V.Harish Kumar

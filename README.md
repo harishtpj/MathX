@@ -1,13 +1,14 @@
 # 📟 MathX
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 [![python-version](https://img.shields.io/badge/Python-v3.9.10-blue)](https://www.python.org/)
+![mathx-version](https://img.shields.io/badge/MathX-v1.5-orange)
 
 MAthX - A Mathematical Statement-based Expressional language
 written in Python.
 
 # ℹ About
 Mathx is a Compiler written in Python which Compiles to C Language. This has a very simple syntax which can also be used as C alternative to Very small programs.
-It is actually version 2.0 of Mathsel Compiler written in java with some new syntax and features. [Click here](https://harish-kumar.gitbook.io/mathx-manual/) for Documentation/Tutorial on the Language
+It is actually version 2.0 of Mathsel Compiler written in java with some new syntax and features. The current version of MathX is v1.5. [Click here](https://harish-kumar.gitbook.io/mathx-manual/) for Documentation/Tutorial on the Language
 
 # 👨‍💻 Created By
   - M.V.Harish Kumar

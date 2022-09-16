@@ -1,3 +1,6 @@
+import string.
+create constant HELLO with value "Hello Everyone".
+
 main-para:-
 
 println "Hi Everyone".
@@ -7,3 +10,10 @@ increment @iax.
 println "This is no %d from mathsel", iax.
 decrement @iax.
 println "This is no %d from mathsel", iax.
+println HELLO.
+
+create variable concated of type String.
+set $concated to "Hello ".
+strcat concated, "Raam!".
+
+println "%s" , concated.

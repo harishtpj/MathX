@@ -49,8 +49,8 @@ def Compile(program_stmt):
             cprog += f"printf({Retexp(stmt)});\n"
             cprog += "printf(\"\\n\");\n"
 
-        elif re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|[\"]?\w+(\.\d+)?[\"]?)", stmt): # Sets variable value
-            match = re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|[\"]?\w+(\.\d+)?[\"]?)", stmt)
+        elif re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|\w+\((\w|,| |(\".*?\"))+\)|[\"]?(\w|[ ,.!])+(\.\d+)?[\"]?)", stmt): # Sets variable value
+            match = re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|\w+\((\w|,| |(\".*?\"))+\)|[\"]?(\w|[ ,.!])+(\.\d+)?[\"]?)", stmt)
             var = match.group(1)
             val = match.group(2)
             if var[1:] in variables:
@@ -86,6 +86,8 @@ def Compile(program_stmt):
                     elif var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "double":
                         cprog += f"{var[1:]} = {val};\n"
                     elif var[0] == '#' and var[1:] in Keywords.Vars["bool"] and Tools.GetDataTypeValue(val) == "bool":
+                        cprog += f"{var[1:]} = {val};\n"
+                    elif re.match(r"\w+\((\w|,| |(\".*?\"))+\)", val):
                         cprog += f"{var[1:]} = {val};\n"
                     else:
                         Tools.ThrowError(RuntimeError(
@@ -143,6 +145,17 @@ def Compile(program_stmt):
             else:
                 cprog += f"{vtype} {var};\n"
                 Keywords.Vars[vtype].append(var)
+        
+        elif re.search(r"create constant ([A-Z0-9_]+) with value ([\"]?(\w| )+(\.\d+)?[\"]?)", stmt): # Creates User-Defined Constants
+            match = re.search(r"create constant ([A-Z0-9_]+) with value ([\"]?(\w| )+(\.\d+)?[\"]?)", stmt)
+            const = match.group(1)
+            constval = match.group(2)
+            cprog += f"#define {const} {constval}\n"
+
+        elif re.search(r"import (\w+)", stmt): # Imports C Libraries
+            match = re.search(r"import (\w+)", stmt)
+            lib = match.group(1)
+            cprog += f"#include \"{lib}.h\"\n"
 
         elif re.search(r"increment ([$@!#]\w+)", stmt): # Increment Variable
             match = re.search(r"increment ([$@!#]\w+)", stmt)
@@ -656,6 +669,12 @@ def Compile(program_stmt):
                     stmt,
                     program_stmt.index(stmt)+1
                 ))
+        
+        elif re.search(r"(\w+) ((\w|,| |(\".*?\"))+)", stmt): # Function Syntax
+            match = re.search(r"(\w+) ((\w|,| |(\".*?\"))+)", stmt)
+            fn = match.group(1)
+            args = match.group(2)
+            cprog += f"{fn}({args});\n"
         
         else:
             if " greater than " in stmt: stmt = stmt.replace("greater than", ">")

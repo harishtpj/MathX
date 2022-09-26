@@ -5,5 +5,5 @@ print "Hello".
 println "Hi Everyone".
 set @iax to 97.
 set $cax to "Harish".
-println "Hello, %s", cax.
-println "Printing %d", iax.
+println "Hello, %s", $cax.
+println "Printing %d", @iax.

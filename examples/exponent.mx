@@ -9,23 +9,23 @@ input to @ibx.
 
 !: Square and Square Root.
 square @iax to @icx.
-println "Square of %d is %d", iax, icx.
+println "Square of %d is %d", @iax, @icx.
 
 sqrt @ibx to @idx.
-println "Sqrt of %d is %d", ibx, idx.
+println "Sqrt of %d is %d", @ibx, @idx.
 
 !: Cube and Cube Root.
 cube @iax to @icx.
-println "Cube of %d is %d", iax, icx.
+println "Cube of %d is %d", @iax, @icx.
 
 cbrt @ibx to @idx.
-println "Cbrt of %d is %d", ibx, idx.
+println "Cbrt of %d is %d", @ibx, @idx.
 
 !: Common Powers and Root.
 set @icx to @iax.
 power @icx with 4.
-println "%d ^ 4 = %d", iax, icx.
+println "%d ^ 4 = %d", @iax, @icx.
 
 set @idx to @ibx.
 root @idx with 5.
-println "root 5 of %d = %d", ibx, idx.
+println "root 5 of %d = %d", @ibx, @idx.

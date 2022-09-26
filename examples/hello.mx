@@ -1,19 +1,19 @@
 import string.
-create constant HELLO with value "Hello Everyone".
+create constant *HELLO with value "Hello Everyone".
 
 main-para:-
 
 println "Hi Everyone".
 set @iax to 10.
-println "This is no %d from mathsel", iax.
+println "This is no %d from mathsel", @iax.
 increment @iax.
-println "This is no %d from mathsel", iax.
+println "This is no %d from mathsel", @iax.
 decrement @iax.
-println "This is no %d from mathsel", iax.
-println HELLO.
+println "This is no %d from mathsel", @iax.
+println *HELLO.
 
-create variable concated of type String.
+create variable $concated of type String.
 set $concated to "Hello ".
-strcat concated, "Raam!".
+strcat($concated, "Raam!").
 
-println "%s" , concated.
+println "%s" , $concated.

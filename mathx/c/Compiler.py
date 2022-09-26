@@ -20,10 +20,25 @@
 # SOFTWARE.
 
 import re
+import shlex
 from .. import Keywords
 from ..errors.runtime_error import RuntimeError
 from .. import Tools
 
+def Preprocess(stmt):
+    if " greater than " in stmt: stmt = stmt.replace("greater than", ">")
+    if " lesser than " in stmt: stmt = stmt.replace("lesser than", "<")
+    if " and " in stmt: stmt = stmt.replace("and", "&&")
+    if " or " in stmt: stmt = stmt.replace("or", "||")
+    if " not " in stmt: stmt = stmt.replace("not ", "!")
+    if " equal to " in stmt: stmt = stmt.replace("equal to", "==")
+    if " mod " in stmt: stmt = stmt.replace("mod", "%")
+    if " equals " in stmt: stmt = stmt.replace(" equals", "=")
+    if "do" in stmt: stmt = stmt.replace("do", "{")
+    if "end" in stmt: stmt = stmt.replace("end", "}")
+    if "else" in stmt: stmt = stmt.replace("else", "} else ")
+    
+    return stmt
 
 def Fstexp(stmt):
     return stmt.split(" ")[0]
@@ -37,20 +52,63 @@ def Compile(program_stmt):
 
     for stmt in program_stmt:
         stmt = stmt.strip()
+        stmtlst = []
+        for word in shlex.split(stmt,posix=False):
+            if word[0] == "\"" and word[-1] == "\"":
+                stmtlst.append(word)
+            elif word[0] == "*":
+                stmtlst.append(word)
+            elif word == "Integer":
+                stmtlst.append("int")
+            elif word == "Boolean":
+                stmtlst.append("bool")
+            elif word == "Double":
+                stmtlst.append("double")
+            elif word == "String":
+                stmtlst.append("String")
+            else:
+                stmtlst.append(word.lower())
+        stmt = Preprocess(" ".join(stmtlst))
         variables = sum(Keywords.Vars.values(), [])
 
         if Fstexp(stmt) == "!:":  # Comments
             continue
         
         elif Fstexp(stmt) == "print": # Prints String
+            stl = []
+            for w in shlex.split(Retexp(stmt), posix=False):
+                if w[0] in ["@", "#", "!", "$", "*"]:
+                    stl.append(w[1:])
+                else:
+                    stl.append(w)
+            stmt = Fstexp(stmt) + " " + " ".join(stl)
+
             cprog += f"printf({Retexp(stmt)});\n"
 
         elif Fstexp(stmt) == "println": # Prints String with newline
+            stl = []
+            for w in shlex.split(Retexp(stmt), posix=False):
+                if w[0] in ["@", "#", "!", "$", "*"]:
+                    stl.append(w[1:])
+                else:
+                    stl.append(w)
+            stmt = Fstexp(stmt) + " " + " ".join(stl)
+
             cprog += f"printf({Retexp(stmt)});\n"
             cprog += "printf(\"\\n\");\n"
+        
+        elif Fstexp(stmt) == "compute": # Computes the assignment
+            stl = []
+            for w in shlex.split(Retexp(stmt), posix=False):
+                if w[0] in ["@", "#", "!", "$", "*"]:
+                    stl.append(w[1:])
+                else:
+                    stl.append(w)
+            stmt = Fstexp(stmt) + " " + " ".join(stl)
+            cprog += f"{Retexp(stmt)};\n"
 
-        elif re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|\w+\((\w|,| |(\".*?\"))+\)|[\"]?(\w|[ ,.!])+(\.\d+)?[\"]?)", stmt): # Sets variable value
-            match = re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|\w+\((\w|,| |(\".*?\"))+\)|[\"]?(\w|[ ,.!])+(\.\d+)?[\"]?)", stmt)
+        elif re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|\w+\(([$@!#\*]?\w|,| |(\".*?\"))+\)|[\"]?(\w|[ ,.!])+(\.\d+)?[\"]?)", stmt): # Sets variable value
+            match = re.search(r"set ([$@!#]\w+) to ([$@!#]\w+|\w+\(([$@!#\*]?\w|,| |(\".*?\"))+\)|[\"]?(\w|[ ,.!])+(\.\d+)?[\"]?)", stmt)
             var = match.group(1)
             val = match.group(2)
             if var[1:] in variables:
@@ -72,7 +130,7 @@ def Compile(program_stmt):
                             "AssignmentError",
                             f"Can't assign {val} of type {Tools.GetDataType(val[1:])} to {var}({Tools.GetDataType(var[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '$' and var[1:] in Keywords.Vars["String"] and Tools.GetDataTypeValue(val) == "String":
@@ -87,21 +145,32 @@ def Compile(program_stmt):
                         cprog += f"{var[1:]} = {val};\n"
                     elif var[0] == '#' and var[1:] in Keywords.Vars["bool"] and Tools.GetDataTypeValue(val) == "bool":
                         cprog += f"{var[1:]} = {val};\n"
-                    elif re.match(r"\w+\((\w|,| |(\".*?\"))+\)", val):
+                    elif re.match(r"(\w+)\(([@#!$\*]?(\w|,| |(\".*?\"))+)\)", val):
+                        match = re.search(r"(\w+)\(([@#!$\*]?(\w|,| |(\".*?\"))+)\)", val)
+                        fn = match.group(1)
+                        args = match.group(2)
+                        stl = []
+                        for w in shlex.split(args, posix=False):
+                            if w[0] in ["@", "#", "!", "$", "*"]:
+                                stl.append(w[1:])
+                            else:
+                                stl.append(w)
+                        args = " ".join(stl)
+                        val = f"{fn}({args})"
                         cprog += f"{var[1:]} = {val};\n"
                     else:
                         Tools.ThrowError(RuntimeError(
                             "AssignmentError",
                             f"Can't assign {val} of type {Tools.GetDataTypeValue(val[1:])} to {var}({Tools.GetDataType(var[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"input to ([$@!]\w+)", stmt): # Gets user input
@@ -121,11 +190,11 @@ def Compile(program_stmt):
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
-        elif re.search(r"create variable (\w+) of type (\w+)", stmt): # Creates User-Defined Variables
-            match = re.search(r"create variable (\w+) of type (\w+)", stmt)
+        elif re.search(r"create variable [$@!#](\w+) of type (\w+)", stmt): # Creates User-Defined Variables
+            match = re.search(r"create variable [$@!#](\w+) of type (\w+)", stmt)
             var = match.group(1)
             vtype = match.group(2)
             if var in variables:
@@ -133,21 +202,21 @@ def Compile(program_stmt):
                     "VarError",
                     f"Can't Reassign variable {var} which was already created",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
             elif vtype not in Keywords.Vars.keys():
                 Tools.ThrowError(RuntimeError(
                     "SyntaxError",
                     f"Unknown Data Type - {vtype}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
             else:
                 cprog += f"{vtype} {var};\n"
                 Keywords.Vars[vtype].append(var)
         
-        elif re.search(r"create constant ([A-Z0-9_]+) with value ([\"]?(\w| )+(\.\d+)?[\"]?)", stmt): # Creates User-Defined Constants
-            match = re.search(r"create constant ([A-Z0-9_]+) with value ([\"]?(\w| )+(\.\d+)?[\"]?)", stmt)
+        elif re.search(r"create constant \*([A-Z0-9_]+) with value ([\"]?(\w| )+(\.\d+)?[\"]?)", stmt): # Creates User-Defined Constants
+            match = re.search(r"create constant \*([A-Z0-9_]+) with value ([\"]?(\w| )+(\.\d+)?[\"]?)", stmt)
             const = match.group(1)
             constval = match.group(2)
             cprog += f"#define {const} {constval}\n"
@@ -166,14 +235,14 @@ def Compile(program_stmt):
                         "InvalidOperationsError",
                         "String can't be incremented",
                         stmt,
-                        program_stmt.index(stmt)+1
+                        [ps.strip() for ps in program_stmt].index(stmt)+1
                     ))
                 elif var[0] == '#':
                     Tools.ThrowError(RuntimeError(
                         "InvalidOperationsError",
                         "Boolean can't be incremented",
                         stmt,
-                        program_stmt.index(stmt)+1
+                        [ps.strip() for ps in program_stmt].index(stmt)+1
                     ))
                 else:
                     cprog += f"++{var[1:]};\n"
@@ -182,7 +251,7 @@ def Compile(program_stmt):
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"decrement ([$@!#]\w+)", stmt): # Decrement Variable
@@ -194,14 +263,14 @@ def Compile(program_stmt):
                         "InvalidOperationsError",
                         "String can't be decremented",
                         stmt,
-                        program_stmt.index(stmt)+1
+                        [ps.strip() for ps in program_stmt].index(stmt)+1
                     ))
                 elif var[0] == '#':
                     Tools.ThrowError(RuntimeError(
                         "InvalidOperationsError",
                         "Boolean can't be decremented",
                         stmt,
-                        program_stmt.index(stmt)+1
+                        [ps.strip() for ps in program_stmt].index(stmt)+1
                     ))
                 else:
                     cprog += f"--{var[1:]};\n"
@@ -210,7 +279,7 @@ def Compile(program_stmt):
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"add ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Addition
@@ -232,7 +301,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate + on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
@@ -248,14 +317,14 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate + on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"subtract ([$@!#]\w+|\d+(\.\d+)?) from ([$@!#]\w+)", stmt): # Subtraction
@@ -277,7 +346,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate - on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
@@ -293,14 +362,14 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate - on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"multiply ([$@!#]\w+|\d+(\.\d+)?) with ([$@!#]\w+)", stmt): # Multiplication
@@ -322,7 +391,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate * on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
@@ -338,14 +407,14 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate * on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"divide ([$@!#]\w+|\d+(\.\d+)?) into ([$@!#]\w+)", stmt): # Division
@@ -367,7 +436,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate / on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
@@ -383,21 +452,21 @@ def Compile(program_stmt):
                             "ZeroDivisionError",
                             f"Can't divide {var} by 0",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                     else:
                         Tools.ThrowError(RuntimeError(
                             "InvalidOperationsError",
                             f"Can't operate / on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"square ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Square
@@ -419,7 +488,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^2 on {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
@@ -435,14 +504,14 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^2 on {val}({Tools.GetDataTypeValue(val)})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"sqrt ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Square root
@@ -464,7 +533,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^1/2 on {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
@@ -480,14 +549,14 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^1/2 on {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
         
         elif re.search(r"cube ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Cube
@@ -509,7 +578,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^3 on {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
@@ -525,14 +594,14 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^3 on {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
         
         elif re.search(r"cbrt ([$@!#]\w+|\d+(\.\d+)?) to ([$@!#]\w+)", stmt): # Cube root
@@ -554,7 +623,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^1/3 on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataType(val[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(val) == "int":
@@ -570,14 +639,14 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^1/3 on {var}({Tools.GetDataType(var[1:])}) and {val}({Tools.GetDataTypeValue(val)})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
 
         elif re.search(r"power ([$@!#]\w+) with ([$@!#]\w+|\d+(\.\d+)?)", stmt): # Power var with exp
@@ -599,7 +668,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^{exp[1:]} on {var}({Tools.GetDataType(var[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(exp) == "int":
@@ -615,14 +684,14 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^{exp} on {var}({Tools.GetDataType(var[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
         
         elif re.search(r"root ([$@!#]\w+) with ([$@!#]\w+|\d+(\.\d+)?)", stmt): # root var with exp
@@ -644,7 +713,7 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^{exp[1:]} on {var}({Tools.GetDataType(var[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
                 else:
                     if var[0] == '@' and var[1:] in Keywords.Vars["int"] and Tools.GetDataTypeValue(exp) == "int":
@@ -660,32 +729,44 @@ def Compile(program_stmt):
                             "InvalidOperationsError",
                             f"Can't operate ^{exp} on {var}({Tools.GetDataType(var[1:])})",
                             stmt,
-                            program_stmt.index(stmt)+1
+                            [ps.strip() for ps in program_stmt].index(stmt)+1
                         ))
             else:
                 Tools.ThrowError(RuntimeError(
                     "VarError",
                     f"Can't find variable {var}",
                     stmt,
-                    program_stmt.index(stmt)+1
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
                 ))
         
-        elif re.search(r"(\w+) ((\w|,| |(\".*?\"))+)", stmt): # Function Syntax
-            match = re.search(r"(\w+) ((\w|,| |(\".*?\"))+)", stmt)
+        elif re.search(r"if (.*) then", stmt): #If Condition
+            match = re.search(r"if (.*) then", stmt)
+            ifcond = match.group(1)
+            cprog += f"if ({ifcond})" + "{\n"
+        
+        elif re.search(r"(\w+)\(([@#!$\*]?(\w|,| |(\".*?\"))+)\)", stmt): # Function Syntax
+            match = re.search(r"(\w+)\(([@#!$\*]?(\w|,| |(\".*?\"))+)\)", stmt)
             fn = match.group(1)
             args = match.group(2)
+            stl = []
+            for w in shlex.split(args, posix=False):
+                if w[0] in ["@", "#", "!", "$", "*"]:
+                    stl.append(w[1:])
+                else:
+                    stl.append(w)
+            args = " ".join(stl)
             cprog += f"{fn}({args});\n"
         
         else:
-            if " greater than " in stmt: stmt = stmt.replace("greater than", ">")
-            if " lesser than " in stmt: stmt = stmt.replace("lesser than", "<")
-            if " and " in stmt: stmt = stmt.replace("and", "&&")
-            if " or " in stmt: stmt = stmt.replace("or", "||")
-            if " not " in stmt: stmt = stmt.replace("not ", "!")
-            if " equal to " in stmt: stmt = stmt.replace("equal to", "==")
-            if " mod " in stmt: stmt = stmt.replace("mod", "%")
-            if " equals " in stmt: stmt = stmt.replace(" equals", "=")
-            cprog += stmt + "\n" # C program
+            if stmt == '':
+                continue
+            else:
+                Tools.ThrowError(RuntimeError(
+                    "SyntaxError",
+                    "Invalid Statement",
+                    stmt,
+                    [ps.strip() for ps in program_stmt].index(stmt)+1
+                ))
             
     
     return cprog

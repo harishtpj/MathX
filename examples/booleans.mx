@@ -2,8 +2,8 @@
 
 main-para:-
 
-create variable test of type bool.
-create variable test2 of type bool.
+create variable #test of type Boolean.
+create variable #test2 of type Boolean.
 
 set #test to true.
-print "%d", test.
+print "%d", #test.

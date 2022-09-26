@@ -41,10 +41,13 @@ class Mathx:
         try:
             main_index = program_stmt.index("main-para:-\n")
         except ValueError:
-            Tools.ThrowError(CompilerError(
-                "EntryError",
-                f"No main-para found in {fname}"
-            ))
+            try:
+                main_index = program_stmt.index("MAIN-PARA:-\n")
+            except ValueError:
+                Tools.ThrowError(CompilerError(
+                    "EntryError",
+                    f"No main-para found in {fname}"
+                ))
 
         pre = program_stmt[:main_index]
         main = program_stmt[main_index+1:]
@@ -67,10 +70,13 @@ class Mathx:
         try:
             main_index = program_stmt.index("main-para:-\n")
         except ValueError:
-            Tools.ThrowError(CompilerError(
-                "EntryError",
-                f"No main-para found in {fname}"
-            ))
+            try:
+                main_index = program_stmt.index("MAIN-PARA:-\n")
+            except ValueError:
+                Tools.ThrowError(CompilerError(
+                    "EntryError",
+                    f"No main-para found in {fname}"
+                ))
 
         pre = program_stmt[:main_index]
         main = program_stmt[main_index+1:]

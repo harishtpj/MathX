@@ -1,0 +1,6 @@
+!: MathX program to check for Capital-Style Coding.
+
+MAIN-PARA:-
+CREATE VARIABLE $NAME OF TYPE String.
+SET $NAME TO "RAAM".
+PRINTLN "%s", $NAME.

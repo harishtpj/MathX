@@ -10,19 +10,19 @@ input to @ibx.
 !: Addition.
 set @icx to @iax.
 add @ibx to @icx.
-println "%d + %d = %d", iax, ibx, icx.
+println "%d + %d = %d", @iax, @ibx, @icx.
 
 !: Subtraction.
 set @icx to @iax.
 subtract @ibx from @icx.
-println "%d - %d = %d", iax, ibx, icx.
+println "%d - %d = %d", @iax, @ibx, @icx.
 
 !: Multiplication.
 set @icx to @iax.
 multiply @ibx with @icx.
-println "%d * %d = %d", iax, ibx, icx.
+println "%d * %d = %d", @iax, @ibx, @icx.
 
 !: Division.
 set !dcx to @iax.
 divide @ibx into !dcx.
-println "%d / %d = %f", iax, ibx, dcx.
+println "%d / %d = %f", @iax, @ibx, !dcx.

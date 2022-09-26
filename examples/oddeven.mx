@@ -2,12 +2,12 @@
 
 main-para:-
 
-create variable num of type int.
+create variable @num of type Integer.
 print "Enter a no: ".
 input to @num.
 
-if (num mod 2 equal to 0) {
-    print "%d is even", num.
-} else {
-    print "%d is odd", num.
-}
+if num mod 2 equal to 0 then do
+    print "%d is even", @num.
+else do
+    print "%d is odd", @num.
+end
